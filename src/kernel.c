@@ -10,6 +10,8 @@
 #include "timer.h"
 #include "keyboard.h"
 #include "shell.h"
+#include "multiboot.h"
+#include "pmm.h"
 
 
 void kernel_main(unsigned int magic, unsigned int info_addr)
@@ -18,11 +20,15 @@ void kernel_main(unsigned int magic, unsigned int info_addr)
     char c;
     char buffer[11];
     unsigned int *info = (unsigned int *)info_addr;
+    unsigned int mmap_addr;
+    unsigned int mmap_end;
+    unsigned int page_a, page_b, page_c;
+    struct mmap_entry *entry;
 
     vga_clear();
     vga_print("hi!Kernel started\n");
     
-    if (magic != 0x2BADB002) {
+    if (magic != MULTIBOOT_BOOTLOADER_MAGIC) {
         vga_print("[ WARN ] Not loaded by a Multiboot loader\n");
     } else if ((info[0] & 1) == 0) {
         vga_print("Memory info: not provided");
@@ -36,7 +42,50 @@ void kernel_main(unsigned int magic, unsigned int info_addr)
         uint_to_string(info[2], buffer);
         vga_print(buffer);
         vga_print(" KB\n");
+
+        if (info[0] & MULTIBOOT_FLAG_MMAP) {
+            mmap_addr = info[12];
+            mmap_end = info[12] + info[11];
+            vga_print("Memory map:\n");
+            while (mmap_addr < mmap_end) {
+                entry = (struct mmap_entry *)mmap_addr;
+                vga_print("  ");
+                uint_to_hex(entry->base_low, buffer);
+                vga_print(buffer);
+                vga_print(" len ");
+                uint_to_hex(entry->length_low, buffer);
+                vga_print(buffer);
+                vga_print(" type ");
+                uint_to_string(entry->type, buffer);
+                vga_print(buffer);
+                vga_print("\n");
+                mmap_addr = mmap_addr + entry->size + 4;
+            }
+        }
     }
+
+    pmm_init(info);
+    vga_print("Free pages: ");
+    uint_to_string(pmm_free_count(), buffer);
+    vga_print(buffer);
+    vga_print("\n");
+
+    page_a = pmm_alloc_page();
+    page_b = pmm_alloc_page();
+    pmm_free_page(page_a);
+    page_c = pmm_alloc_page();
+    vga_print("Pages a, b, c: ");
+    uint_to_hex(page_a, buffer);
+    vga_print(buffer);
+    vga_print(" ");
+    uint_to_hex(page_b, buffer);
+    vga_print(buffer);
+    vga_print(" ");
+    uint_to_hex(page_c, buffer);
+    vga_print(buffer);
+    vga_print("\n");
+    pmm_free_page(page_b);
+    pmm_free_page(page_c);
 
     vga_print("[ INIT ] Loading GDT...\n");
     gdt_init();

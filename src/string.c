@@ -42,3 +42,15 @@ int strcmp(const char *a, const char *b)
     return (unsigned char)a[i] - (unsigned char)b[i];
 }
 
+void uint_to_hex(unsigned int number, char *buffer)
+{
+    const char *digits = "0123456789ABCDEF";
+    int i;
+
+    buffer[0] = '0';
+    buffer[1] = 'x';
+    for (i = 0; i < 8; i++) {
+        buffer[2 + i] = digits[(number >> (28 - 4 * i)) & 0xF];
+    }
+    buffer[10] = '\0';
+}
