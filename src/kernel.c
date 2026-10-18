@@ -12,14 +12,32 @@
 #include "shell.h"
 
 
-void kernel_main(void)
+void kernel_main(unsigned int magic, unsigned int info_addr)
 {
     int i;
     char c;
+    char buffer[11];
+    unsigned int *info = (unsigned int *)info_addr;
 
     vga_clear();
     vga_print("hi!Kernel started\n");
     
+    if (magic != 0x2BADB002) {
+        vga_print("[ WARN ] Not loaded by a Multiboot loader\n");
+    } else if ((info[0] & 1) == 0) {
+        vga_print("Memory info: not provided");
+    } else {
+        vga_print("Memory below 1MB: ");
+        uint_to_string(info[1], buffer);
+        vga_print(buffer);
+        vga_print(" KB\n");
+
+        vga_print("Memory above 1MB: ");
+        uint_to_string(info[2], buffer);
+        vga_print(buffer);
+        vga_print(" KB\n");
+    }
+
     vga_print("[ INIT ] Loading GDT...\n");
     gdt_init();
     vga_print("[ OK ] GDT loaded.\n");

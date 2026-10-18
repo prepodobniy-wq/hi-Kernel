@@ -2,7 +2,7 @@
 ; Entry point of hi!Kernel
 
 MULTIBOOT_MAGIC       equ 0x1BADB002
-MULTIBOOT_FLAGS       equ 0
+MULTIBOOT_FLAGS       equ 2
 MULTIBOOT_CHECKSUM    equ -(MULTIBOOT_MAGIC + MULTIBOOT_FLAGS)
 
 ; header for GRUB
@@ -25,6 +25,9 @@ extern kernel_main
 
 _start:
     mov esp, stack_top      ; setting up stack
+    sub esp, 8
+    push ebx
+    push eax
     call kernel_main        ; giving control to C-code
 
 .hang:
