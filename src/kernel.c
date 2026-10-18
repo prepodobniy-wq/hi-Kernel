@@ -9,6 +9,7 @@
 #include "irq.h"
 #include "timer.h"
 #include "keyboard.h"
+#include "shell.h"
 
 
 void kernel_main(void)
@@ -43,13 +44,14 @@ void kernel_main(void)
 
     keyboard_init();
     pic_unmask(1);
+    sh_init();
 
     __asm__ volatile ("sti");       // turning on interrupts
 
     while (1) {
         c = keyboard_get_char();
         if (c != 0) {
-            vga_put_char(c);
+            sh_handle_char(c);
         } else {
             __asm__ volatile ("hlt");
         }

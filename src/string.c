@@ -32,3 +32,13 @@ void uint_to_string(unsigned int number, char *buffer)
     buffer[count] = '\0';
 }
 
+int strcmp(const char *a, const char *b)
+{
+    int i = 0;
+
+    while (a[i] != '\0' && a[i] == b[i]) {
+        i++;
+    }
+    return (unsigned char)a[i] - (unsigned char)b[i];
+}
+

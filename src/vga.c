@@ -1,4 +1,5 @@
 // src/vga.c
+//
 // displaying text on the screen in VGA text mode
 
 #define VGA_MEMORY  0xB8000
@@ -55,6 +56,14 @@ void vga_put_char(char c)
 {
     if (c == '\n') {
         new_line();
+        return;
+    }
+
+    if (c == '\b') {
+        if (cursor_col > 0) {
+            cursor_col--;
+            video[cursor_row * VGA_WIDTH + cursor_col] = make_cell(' ');
+        }
         return;
     }
 

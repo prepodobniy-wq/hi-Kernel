@@ -66,12 +66,16 @@ build/timer.o: src/timer.c src/timer.h src/ports.h src/isr.h src/irq.h
 	mkdir -p build
 	$(CC) $(CFLAGS) -c src/timer.c -o build/timer.o
 
+build/shell.o: src/shell.c src/shell.h src/vga.h src/string.h src/timer.h
+	mkdir -p build
+	$(CC) $(CFLAGS) -c src/shell.c -o build/shell.o
+
 build/keyboard.o: src/keyboard.c src/keyboard.h src/ports.h src/isr.h src/irq.h
 	mkdir -p build
 	$(CC) $(CFLAGS) -c src/keyboard.c -o build/keyboard.o
 
-build/kernel.elf: build/boot.o build/kernel.o build/vga.o build/string.o build/gdt.o build/gdt_flush.o build/idt.o build/idt_load.o build/isr_asm.o build/isr.o build/pic.o build/irq_asm.o build/irq.o build/timer.o build/keyboard.o linker.ld
-	$(LD) $(LDFLAGS) -o build/kernel.elf build/boot.o build/kernel.o build/vga.o build/string.o build/gdt.o build/gdt_flush.o build/idt.o build/idt_load.o build/isr_asm.o build/isr.o build/pic.o build/irq_asm.o build/irq.o build/timer.o build/keyboard.o
+build/kernel.elf: build/boot.o build/kernel.o build/vga.o build/string.o build/gdt.o build/gdt_flush.o build/idt.o build/idt_load.o build/isr_asm.o build/isr.o build/pic.o build/irq_asm.o build/irq.o build/timer.o build/keyboard.o build/shell.o linker.ld
+	$(LD) $(LDFLAGS) -o build/kernel.elf build/boot.o build/kernel.o build/vga.o build/string.o build/gdt.o build/gdt_flush.o build/idt.o build/idt_load.o build/isr_asm.o build/isr.o build/pic.o build/irq_asm.o build/irq.o build/timer.o build/keyboard.o build/shell.o
 
 build/hikernel.iso: build/kernel.elf iso/boot/grub/grub.cfg
 	cp build/kernel.elf iso/boot/kernel.elf
@@ -81,6 +85,6 @@ run: build/hikernel.iso
 	qemu-system-i386 -cdrom build/hikernel.iso
 
 clean:
-	rm -f build/boot.o build/kernel.o build/vga.o build/string.o build/gdt.o build/gdt_flush.o build/idt.o build/idt_load.o build/isr_asm.o build/isr.o build/pic.o build/irq_asm.o build/irq.o build/timer.o build/keyboard.o build/kernel.elf build/hikernel.iso iso/boot/kernel.elf
+	rm -f build/boot.o build/kernel.o build/vga.o build/string.o build/gdt.o build/gdt_flush.o build/idt.o build/idt_load.o build/isr_asm.o build/isr.o build/pic.o build/irq_asm.o build/irq.o build/timer.o build/keyboard.o build/shell.o build/kernel.elf build/hikernel.iso iso/boot/kernel.elf
 
 .PHONY: all run clean
