@@ -1,0 +1,10 @@
+; src/idt_load.asm
+; loading IDT into processor
+
+section .text
+global idt_load
+
+idt_load:
+    mov eax, [esp + 4]
+    lidt [eax]
+    ret

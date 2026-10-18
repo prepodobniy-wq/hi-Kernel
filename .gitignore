@@ -1,0 +1,6 @@
+# .gitignore
+
+build/
+iso/boot/kernel.elf
+*.o
+qemu.log
