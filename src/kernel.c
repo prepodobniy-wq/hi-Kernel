@@ -22,7 +22,6 @@ void kernel_main(unsigned int magic, unsigned int info_addr)
     unsigned int *info = (unsigned int *)info_addr;
     unsigned int mmap_addr;
     unsigned int mmap_end;
-    unsigned int page_a, page_b, page_c;
     struct mmap_entry *entry;
 
     vga_clear();
@@ -69,23 +68,6 @@ void kernel_main(unsigned int magic, unsigned int info_addr)
     uint_to_string(pmm_free_count(), buffer);
     vga_print(buffer);
     vga_print("\n");
-
-    page_a = pmm_alloc_page();
-    page_b = pmm_alloc_page();
-    pmm_free_page(page_a);
-    page_c = pmm_alloc_page();
-    vga_print("Pages a, b, c: ");
-    uint_to_hex(page_a, buffer);
-    vga_print(buffer);
-    vga_print(" ");
-    uint_to_hex(page_b, buffer);
-    vga_print(buffer);
-    vga_print(" ");
-    uint_to_hex(page_c, buffer);
-    vga_print(buffer);
-    vga_print("\n");
-    pmm_free_page(page_b);
-    pmm_free_page(page_c);
 
     vga_print("[ INIT ] Loading GDT...\n");
     gdt_init();
